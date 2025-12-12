@@ -1,85 +1,102 @@
 /**
- * 주에한번은 - Main Application
+ * 주에한번은 - Main Application v2.0
  * 부모님과의 대화를 더 깊게
  */
 
 // Constants
 const DAYS_KO = ['일', '월', '화', '수', '목', '금', '토'];
-const CATEGORY_LABELS = { past: '과거', present: '현재', future: '미래' };
-const DIFFICULTY_LABELS = { 1: '가벼움', 2: '중간', 3: '깊음' };
+const THEME_LABELS = { past: '과거', future: '미래' };
+const START_DATE = new Date('2024-12-12');
 
-// State - encapsulated object instead of separate variables
+// State
 const state = {
-  questions: [],
-  currentQuestion: null,
-  weekQuestions: [],
+  dailyQuestions: [],
+  specialQuestions: [],
+  currentDaily: null,
+  currentSpecial: null,
+  pastQuestions: [],
   isLoading: false,
-  error: null
+  isMobile: false
 };
 
-// DOM Elements (cached on init)
+// DOM Elements
 let elements = {};
 
 // Initialize application
 async function init() {
+  detectMobile();
   cacheElements();
   updateTodayDate();
   await loadQuestions();
-  displayTodayQuestion();
-  displayWeekQuestions();
+  displayTodayQuestions();
+  displayPastQuestions();
   setupEventListeners();
+  hideKakaoOnDesktop();
 }
 
-// Cache DOM elements for performance
+// Detect mobile device
+function detectMobile() {
+  state.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Hide Kakao buttons on desktop
+function hideKakaoOnDesktop() {
+  if (!state.isMobile) {
+    document.querySelectorAll('.mobile-only').forEach(el => {
+      el.style.display = 'none';
+    });
+  }
+}
+
+// Cache DOM elements
 function cacheElements() {
   elements = {
     todayDate: document.getElementById('todayDate'),
-    questionText: document.getElementById('questionText'),
-    questionMeta: document.getElementById('questionMeta'),
-    categoryTag: document.getElementById('categoryTag'),
-    difficultyTag: document.getElementById('difficultyTag'),
-    weekList: document.getElementById('weekList'),
-    weekCount: document.getElementById('weekCount'),
-    copyBtn: document.getElementById('copyBtn'),
-    refreshBtn: document.getElementById('refreshBtn'),
-    toast: document.getElementById('toast'),
-    errorToast: document.getElementById('errorToast')
+    dailyQuestionText: document.getElementById('dailyQuestionText'),
+    specialQuestionText: document.getElementById('specialQuestionText'),
+    specialThemeTag: document.getElementById('specialThemeTag'),
+    pastList: document.getElementById('pastList'),
+    copyDailyBtn: document.getElementById('copyDailyBtn'),
+    copySpecialBtn: document.getElementById('copySpecialBtn'),
+    kakaoDailyBtn: document.getElementById('kakaoDailyBtn'),
+    kakaoSpecialBtn: document.getElementById('kakaoSpecialBtn'),
+    toast: document.getElementById('toast')
   };
-}
-
-// Update state helper
-function updateState(updates) {
-  Object.assign(state, updates);
 }
 
 // Load questions from JSON
 async function loadQuestions() {
-  updateState({ isLoading: true, error: null });
+  state.isLoading = true;
 
   try {
     const response = await fetch('./data/questions.json');
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
     const data = await response.json();
-    updateState({ questions: data.questions, isLoading: false });
+    state.dailyQuestions = data.questions.daily;
+    state.specialQuestions = data.questions.special;
+    state.isLoading = false;
   } catch (error) {
     console.error('Failed to load questions:', error);
-    updateState({
-      questions: getEmbeddedQuestions(),
-      isLoading: false,
-      error: error.message
-    });
-    showError('질문을 불러오는데 실패했어요. 기본 질문을 표시합니다.');
+    state.dailyQuestions = getEmbeddedDaily();
+    state.specialQuestions = getEmbeddedSpecial();
+    state.isLoading = false;
+    showToast('질문을 불러오는데 실패했어요.', true);
   }
 }
 
 // Fallback embedded questions
-function getEmbeddedQuestions() {
+function getEmbeddedDaily() {
   return [
-    { id: 23, text: "요즘 가장 맛있게 먹은 음식은 뭐야?", category: "present", difficulty: 1 },
-    { id: 24, text: "요즘 하루 중 가장 좋은 시간은 언제야?", category: "present", difficulty: 1 },
-    { id: 1, text: "내가 어렸을 때 가장 웃겼던 순간은 뭐야?", category: "past", difficulty: 1 }
+    { id: 1, text: "요즘 가장 맛있게 먹은 음식은 뭐야?", order: 1 },
+    { id: 2, text: "요즘 하루 중 가장 좋은 시간은 언제야?", order: 2 }
+  ];
+}
+
+function getEmbeddedSpecial() {
+  return [
+    { id: 101, text: "내가 어렸을 때 가장 웃겼던 순간은 뭐야?", theme: "past", order: 1 },
+    { id: 102, text: "같이 가보고 싶은 곳 있어?", theme: "future", order: 2 }
   ];
 }
 
@@ -92,145 +109,120 @@ function updateTodayDate() {
   elements.todayDate.textContent = `${month}월 ${date}일 ${day}요일`;
 }
 
-// Get question for a specific date (deterministic based on date)
-function getQuestionForDate(date) {
-  if (state.questions.length === 0) return null;
-
-  const startDate = new Date('2024-12-12');
-  const diffDays = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
-  const index = ((diffDays % state.questions.length) + state.questions.length) % state.questions.length;
-  return state.questions[index];
+// Get days since start date
+function getDaysSinceStart(date) {
+  const targetDate = new Date(date);
+  targetDate.setHours(0, 0, 0, 0);
+  const diffTime = targetDate - START_DATE;
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
 
-// Display today's question
-function displayTodayQuestion() {
+// Get question for a specific date (deterministic)
+function getDailyQuestion(date) {
+  if (state.dailyQuestions.length === 0) return null;
+  const days = getDaysSinceStart(date);
+  const index = ((days % state.dailyQuestions.length) + state.dailyQuestions.length) % state.dailyQuestions.length;
+  return state.dailyQuestions[index];
+}
+
+function getSpecialQuestion(date) {
+  if (state.specialQuestions.length === 0) return null;
+  const days = getDaysSinceStart(date);
+  const index = ((days % state.specialQuestions.length) + state.specialQuestions.length) % state.specialQuestions.length;
+  return state.specialQuestions[index];
+}
+
+// Display today's questions
+function displayTodayQuestions() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const question = getQuestionForDate(today);
-  updateState({ currentQuestion: question });
 
-  if (question) {
-    elements.questionText.textContent = `"${question.text}"`;
-    elements.categoryTag.textContent = CATEGORY_LABELS[question.category];
-    elements.difficultyTag.textContent = DIFFICULTY_LABELS[question.difficulty];
+  // Daily question
+  state.currentDaily = getDailyQuestion(today);
+  if (state.currentDaily) {
+    elements.dailyQuestionText.textContent = `"${state.currentDaily.text}"`;
   } else {
-    elements.questionText.textContent = '질문을 불러올 수 없습니다.';
+    elements.dailyQuestionText.textContent = '질문을 불러올 수 없습니다.';
+  }
+
+  // Special question
+  state.currentSpecial = getSpecialQuestion(today);
+  if (state.currentSpecial) {
+    elements.specialQuestionText.textContent = `"${state.currentSpecial.text}"`;
+    elements.specialThemeTag.textContent = THEME_LABELS[state.currentSpecial.theme] || '';
+  } else {
+    elements.specialQuestionText.textContent = '질문을 불러올 수 없습니다.';
   }
 }
 
-// Display a random different question
-function displayRandomQuestion() {
-  const currentId = state.currentQuestion?.id;
-  const filteredQuestions = state.questions.filter(q => q.id !== currentId);
-
-  if (filteredQuestions.length === 0) return;
-
-  const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
-  const question = filteredQuestions[randomIndex];
-  updateState({ currentQuestion: question });
-
-  elements.questionText.style.opacity = '0';
-  setTimeout(() => {
-    elements.questionText.textContent = `"${question.text}"`;
-    elements.categoryTag.textContent = CATEGORY_LABELS[question.category];
-    elements.difficultyTag.textContent = DIFFICULTY_LABELS[question.difficulty];
-    elements.questionText.style.opacity = '1';
-  }, 150);
-}
-
-// Display this week's questions
-function displayWeekQuestions() {
+// Display past 7 days questions (8 days ago and older disappear)
+function displayPastQuestions() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  // Get Monday of current week
-  const monday = new Date(today);
-  const dayOfWeek = today.getDay();
-  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  monday.setDate(today.getDate() + diff);
-
-  const weekQuestions = [];
+  const pastQuestions = [];
   let html = '';
-  let passedCount = 0;
 
-  for (let i = 0; i < 7; i++) {
-    const date = new Date(monday);
-    date.setDate(monday.getDate() + i);
+  // Loop through past 7 days (yesterday to 7 days ago)
+  for (let i = 1; i <= 7; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
 
-    const question = getQuestionForDate(date);
-    const isToday = date.getTime() === today.getTime();
-    const isPast = date < today;
-    const isFuture = date > today;
-
-    let statusClass = '';
-    if (isToday) statusClass = 'today';
-    else if (isPast) { statusClass = 'past'; passedCount++; }
-    else statusClass = 'future';
+    const daily = getDailyQuestion(date);
+    const special = getSpecialQuestion(date);
 
     const dayName = DAYS_KO[date.getDay()];
     const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
 
-    weekQuestions.push({ date, question, isToday });
+    pastQuestions.push({ date, daily, special });
 
     html += `
-      <li class="week-item ${statusClass}" data-index="${i}">
-        <span class="week-item-dot"></span>
-        <div class="week-item-content">
-          <span class="week-item-day">${dayName} ${dateStr}</span>
-          <p class="week-item-text">${isFuture ? '(예정)' : (question?.text || '-')}</p>
+      <li class="past-item" data-index="${i - 1}">
+        <div class="past-item-header">
+          <span class="past-item-day">${dayName} ${dateStr}</span>
+          <span class="past-item-ago">${i}일 전</span>
+        </div>
+        <div class="past-item-questions">
+          <div class="past-question">
+            <span class="past-label">일상</span>
+            <p class="past-text">${daily?.text || '-'}</p>
+          </div>
+          <div class="past-question">
+            <span class="past-label ${special?.theme || ''}">${special?.theme ? THEME_LABELS[special.theme] : '특별'}</span>
+            <p class="past-text">${special?.text || '-'}</p>
+          </div>
         </div>
       </li>
     `;
   }
 
-  updateState({ weekQuestions });
-  elements.weekList.innerHTML = html;
-  elements.weekCount.textContent = `${passedCount + (today >= monday ? 1 : 0)}/7`;
+  state.pastQuestions = pastQuestions;
+  elements.pastList.innerHTML = html;
 
-  // Add click handlers using event delegation
-  elements.weekList.addEventListener('click', handleWeekItemClick);
-}
-
-// Handle week item click (event delegation)
-function handleWeekItemClick(event) {
-  const weekItem = event.target.closest('.week-item:not(.future)');
-  if (!weekItem) return;
-
-  const index = parseInt(weekItem.dataset.index);
-  const { question } = state.weekQuestions[index];
-
-  if (!question) return;
-
-  updateState({ currentQuestion: question });
-
-  elements.questionText.style.opacity = '0';
-  setTimeout(() => {
-    elements.questionText.textContent = `"${question.text}"`;
-    elements.categoryTag.textContent = CATEGORY_LABELS[question.category];
-    elements.difficultyTag.textContent = DIFFICULTY_LABELS[question.difficulty];
-    elements.questionText.style.opacity = '1';
-  }, 150);
-
-  // Scroll to question card
-  document.querySelector('.question-card').scrollIntoView({
-    behavior: 'smooth',
-    block: 'center'
+  // Add click handlers for past questions
+  elements.pastList.querySelectorAll('.past-question').forEach((el) => {
+    el.addEventListener('click', handlePastQuestionClick);
   });
 }
 
-// Copy question to clipboard
-async function copyQuestion() {
-  if (!state.currentQuestion) return;
+// Handle past question click (copy directly)
+function handlePastQuestionClick(event) {
+  const textEl = event.currentTarget.querySelector('.past-text');
+  if (!textEl || textEl.textContent === '-') return;
 
+  copyToClipboard(textEl.textContent);
+  trackEvent('copy_past', { question_text: textEl.textContent.substring(0, 50) });
+}
+
+// Copy question to clipboard
+async function copyToClipboard(text) {
   try {
-    await navigator.clipboard.writeText(state.currentQuestion.text);
-    elements.copyBtn.classList.add('btn-copied');
+    await navigator.clipboard.writeText(text);
     showToast('질문이 복사되었어요!');
-    setTimeout(() => elements.copyBtn.classList.remove('btn-copied'), 300);
   } catch (error) {
     // Fallback for older browsers
     const textArea = document.createElement('textarea');
-    textArea.value = state.currentQuestion.text;
+    textArea.value = text;
     textArea.style.position = 'fixed';
     textArea.style.left = '-9999px';
     document.body.appendChild(textArea);
@@ -239,40 +231,60 @@ async function copyQuestion() {
       document.execCommand('copy');
       showToast('질문이 복사되었어요!');
     } catch (copyError) {
-      showError('복사에 실패했어요. 직접 선택해서 복사해주세요.');
+      showToast('복사에 실패했어요.', true);
     }
     document.body.removeChild(textArea);
   }
 }
 
+// Copy handlers
+function copyDaily() {
+  if (!state.currentDaily) return;
+  copyToClipboard(state.currentDaily.text);
+  trackEvent('copy_daily', { question_id: state.currentDaily.id });
+}
+
+function copySpecial() {
+  if (!state.currentSpecial) return;
+  copyToClipboard(state.currentSpecial.text);
+  trackEvent('copy_special', { question_id: state.currentSpecial.id, theme: state.currentSpecial.theme });
+}
+
+// Kakao handlers
+function openKakaoDaily() {
+  trackEvent('open_kakao', { type: 'daily', question_id: state.currentDaily?.id });
+}
+
+function openKakaoSpecial() {
+  trackEvent('open_kakao', { type: 'special', question_id: state.currentSpecial?.id });
+}
+
+// GA4 Event Tracking
+function trackEvent(eventName, params = {}) {
+  if (typeof gtag === 'function') {
+    gtag('event', eventName, params);
+  }
+}
+
 // Show toast notification
-function showToast(message) {
+function showToast(message, isError = false) {
   elements.toast.textContent = message;
-  elements.toast.classList.remove('error');
+  elements.toast.classList.toggle('error', isError);
   elements.toast.classList.add('show');
   setTimeout(() => elements.toast.classList.remove('show'), 2500);
 }
 
-// Show error notification
-function showError(message) {
-  if (elements.errorToast) {
-    elements.errorToast.textContent = message;
-    elements.errorToast.classList.add('show');
-    setTimeout(() => elements.errorToast.classList.remove('show'), 5000);
-  } else {
-    // Fallback to regular toast with error class
-    elements.toast.textContent = message;
-    elements.toast.classList.add('error', 'show');
-    setTimeout(() => {
-      elements.toast.classList.remove('show', 'error');
-    }, 5000);
-  }
-}
-
 // Setup event listeners
 function setupEventListeners() {
-  elements.copyBtn.addEventListener('click', copyQuestion);
-  elements.refreshBtn.addEventListener('click', displayRandomQuestion);
+  elements.copyDailyBtn.addEventListener('click', copyDaily);
+  elements.copySpecialBtn.addEventListener('click', copySpecial);
+
+  if (elements.kakaoDailyBtn) {
+    elements.kakaoDailyBtn.addEventListener('click', openKakaoDaily);
+  }
+  if (elements.kakaoSpecialBtn) {
+    elements.kakaoSpecialBtn.addEventListener('click', openKakaoSpecial);
+  }
 }
 
 // Start application

@@ -1,6 +1,6 @@
 # Fly.io configuration for 주에한번은 Telegram Bot
 
-app = "jueehanbeoneun-bot"
+app = "mwohae-bot"
 primary_region = "nrt"  # Tokyo (closest to Korea)
 
 [build]
@@ -9,6 +9,7 @@ primary_region = "nrt"  # Tokyo (closest to Korea)
 [env]
   # Non-sensitive environment variables
   TZ = "Asia/Seoul"
+  QUESTIONS_PATH = "/app/data/questions.json"
 
 # No HTTP service needed - this is a background worker bot
 # The bot connects outbound to Telegram API

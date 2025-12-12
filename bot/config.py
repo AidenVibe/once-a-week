@@ -1,4 +1,4 @@
-# Telegram Bot Configuration
+# Telegram Bot Configuration v2.0
 import os
 from pathlib import Path
 
@@ -10,15 +10,15 @@ if not BOT_TOKEN:
 
 # Bot settings
 BOT_USERNAME = "mwohae_bot"
+WEB_URL = "https://aidenvibe.github.io/once-a-week/"
 
-# Scheduler settings
-WEEKLY_NOTIFICATION_DAY = 0  # Monday (0 = Monday, 6 = Sunday)
-WEEKLY_NOTIFICATION_HOUR = 9  # 9 AM
-WEEKLY_NOTIFICATION_MINUTE = 0
+# Scheduler settings - Daily at 19:00 (7 PM)
+DAILY_NOTIFICATION_HOUR = 19
+DAILY_NOTIFICATION_MINUTE = 0
 
-# Data paths - use absolute paths resolved from this file's location
+# Data paths
 BOT_DIR = Path(__file__).parent.resolve()
-DEFAULT_QUESTIONS_PATH = BOT_DIR.parent / "docs" / "data" / "questions.json"
+DEFAULT_QUESTIONS_PATH = BOT_DIR / "data" / "questions.json"
 DEFAULT_SUBSCRIBERS_PATH = BOT_DIR / "data" / "subscribers.json"
 
 # Environment variables override defaults
