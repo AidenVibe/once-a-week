@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 # Constants
 THEME_LABELS = {"past": "과거", "future": "미래", "holiday": "기념일"}
-START_DATE = datetime(2024, 12, 12)
+START_DATE = datetime(2025, 12, 12)
 
 # Data storage paths
 DATA_DIR = config.BOT_DIR / "data"

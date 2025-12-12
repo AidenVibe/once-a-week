@@ -5,7 +5,7 @@
 // ========================================
 // Constants
 // ========================================
-const START_DATE = new Date('2024-12-12');
+const START_DATE = new Date('2025-12-12');
 START_DATE.setHours(0, 0, 0, 0);
 
 const DAYS_KO = ['일', '월', '화', '수', '목', '금', '토'];
@@ -268,10 +268,24 @@ function setupCharacterClick() {
 }
 
 // ========================================
-// Mobile Detection
+// Mobile Detection & KakaoTalk
 // ========================================
 function detectMobile() {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function isAndroid() {
+  return /Android/i.test(navigator.userAgent);
+}
+
+function openKakaoTalk() {
+  if (isAndroid()) {
+    // Android: Intent scheme
+    window.location.href = 'intent://main#Intent;scheme=kakaolink;package=com.kakao.talk;end';
+  } else {
+    // iOS and others
+    window.location.href = 'kakaotalk://';
+  }
 }
 
 function hideKakaoOnDesktop() {
@@ -311,9 +325,8 @@ function setupEventListeners() {
     if (daily) {
       await copyToClipboard(daily.text);
       trackEvent('open_kakao', { question_type: 'daily' });
-      // Small delay to ensure copy completes before app switch
       setTimeout(() => {
-        window.location.href = 'kakaotalk://';
+        openKakaoTalk();
       }, 100);
     }
   });
@@ -324,7 +337,7 @@ function setupEventListeners() {
       await copyToClipboard(special.text);
       trackEvent('open_kakao', { question_type: 'special' });
       setTimeout(() => {
-        window.location.href = 'kakaotalk://';
+        openKakaoTalk();
       }, 100);
     }
   });
