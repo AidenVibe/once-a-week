@@ -30,7 +30,7 @@ Thumbs.db
 bot/.env
 
 # Private planning & internal docs
-docs/
+_planning/
 archive/
 images/
 .claude/

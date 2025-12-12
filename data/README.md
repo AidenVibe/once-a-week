@@ -1,6 +1,54 @@
-# 실험 데이터
+# 데이터 명세
 
-## Google Sheets
+## questions.json 스키마
+
+질문 데이터는 `docs/data/questions.json`에 저장됩니다.
+
+### 파일 구조
+```json
+{
+  "questions": [...],
+  "schedule": {
+    "startDate": "2024-12-12",
+    "questionsPerDay": 1
+  }
+}
+```
+
+### 질문 객체 스키마
+
+| 필드 | 타입 | 필수 | 설명 |
+|------|------|------|------|
+| `id` | number | O | 고유 식별자 (1부터 시작) |
+| `text` | string | O | 질문 텍스트 |
+| `category` | string | O | 카테고리 (past/present/future) |
+| `difficulty` | number | O | 난이도 (1: 가벼움, 2: 중간, 3: 깊음) |
+
+### 카테고리 설명
+- **past**: 과거 회상 질문 (추억, 경험)
+- **present**: 현재 상황 질문 (일상, 근황)
+- **future**: 미래 지향 질문 (바람, 계획)
+
+### 예시
+```json
+{
+  "id": 1,
+  "text": "내가 어렸을 때 가장 웃겼던 순간은 뭐야?",
+  "category": "past",
+  "difficulty": 1
+}
+```
+
+### 현재 통계 (55개 질문)
+- 과거(past): 22개 (40%)
+- 현재(present): 20개 (36%)
+- 미래(future): 13개 (24%)
+
+---
+
+## 실험 데이터
+
+### Google Sheets
 - [주에한번은 실험 시트](링크 추가 예정)
 
 ## 시트 구성

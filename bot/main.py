@@ -7,6 +7,9 @@ import json
 import os
 import random
 import logging
+import tempfile
+import shutil
+import asyncio
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -33,11 +36,10 @@ CATEGORY_LABELS = {"past": "과거", "present": "현재", "future": "미래"}
 DIFFICULTY_LABELS = {1: "가벼움", 2: "중간", 3: "깊음"}
 DAYS_KO = ["월", "화", "수", "목", "금", "토", "일"]
 
-# Data storage paths
-BOT_DIR = Path(__file__).parent
-DATA_DIR = BOT_DIR / "data"
-SUBSCRIBERS_PATH = DATA_DIR / "subscribers.json"
-QUESTIONS_PATH = BOT_DIR.parent / "web" / "data" / "questions.json"
+# Data storage paths (from config)
+DATA_DIR = config.BOT_DIR / "data"
+SUBSCRIBERS_PATH = config.SUBSCRIBERS_JSON_PATH
+QUESTIONS_PATH = config.QUESTIONS_JSON_PATH
 
 
 def ensure_data_dir():
@@ -70,10 +72,22 @@ def load_subscribers() -> dict:
 
 
 def save_subscribers(data: dict):
-    """Save subscribers to JSON file."""
+    """Save subscribers atomically to prevent data corruption."""
     ensure_data_dir()
-    with open(SUBSCRIBERS_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+
+    # Write to temporary file first
+    temp_fd, temp_path = tempfile.mkstemp(dir=DATA_DIR, suffix=".json")
+    try:
+        with os.fdopen(temp_fd, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        # Atomic replace (safe even on Windows)
+        shutil.move(temp_path, SUBSCRIBERS_PATH)
+    except Exception:
+        # Clean up temp file on failure
+        if os.path.exists(temp_path):
+            os.unlink(temp_path)
+        raise
 
 
 def add_subscriber(chat_id: int, username: str = None) -> bool:
@@ -381,7 +395,28 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         save_subscribers(subscribers_data)
 
 
-# Scheduled notification
+# Scheduled notification helpers
+async def send_with_retry(bot, chat_id: int, message: str, reply_markup, max_retries: int = 3) -> bool:
+    """Send message with exponential backoff retry logic."""
+    for attempt in range(max_retries):
+        try:
+            await bot.send_message(
+                chat_id=chat_id,
+                text=message,
+                parse_mode="Markdown",
+                reply_markup=reply_markup
+            )
+            return True
+        except Exception as e:
+            if attempt < max_retries - 1:
+                wait_time = 2 ** attempt  # Exponential backoff: 1s, 2s, 4s
+                logger.warning(f"Retry {attempt + 1}/{max_retries} for {chat_id}: {e}")
+                await asyncio.sleep(wait_time)
+            else:
+                logger.error(f"Failed to send to {chat_id} after {max_retries} attempts: {e}")
+                return False
+
+
 async def send_weekly_notification(context: ContextTypes.DEFAULT_TYPE):
     """Send weekly question notification to all subscribers."""
     questions = load_questions()
@@ -407,20 +442,18 @@ async def send_weekly_notification(context: ContextTypes.DEFAULT_TYPE):
 
     subscribers_data = load_subscribers()
     sent_count = 0
+    failed_count = 0
 
     for sub in subscribers_data["subscribers"]:
-        try:
-            await context.bot.send_message(
-                chat_id=sub["chat_id"],
-                text=message,
-                parse_mode="Markdown",
-                reply_markup=reply_markup
-            )
+        success = await send_with_retry(
+            context.bot, sub["chat_id"], message, reply_markup
+        )
+        if success:
             sent_count += 1
-        except Exception as e:
-            logger.error(f"Failed to send to {sub['chat_id']}: {e}")
+        else:
+            failed_count += 1
 
-    logger.info(f"Weekly notification sent to {sent_count} subscribers")
+    logger.info(f"Weekly notification: {sent_count} sent, {failed_count} failed")
 
 
 async def post_init(application: Application):
