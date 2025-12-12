@@ -16,8 +16,9 @@ const CHARACTER_MESSAGES = [
   '오늘도 화이팅!',
   '부모님이 기다리셔요',
   '따뜻한 말 한마디',
-  '지금이 타이밍!',
-  '목소리 들려주세요'
+  '지금이 바로 타이밍!',
+  '어떤 질문을 보내보지?',
+  '목소리를 들려드려요'
 ];
 
 // ========================================
@@ -175,7 +176,6 @@ function createHistoryItem(date, type, label, text) {
 async function copyToClipboard(text) {
   try {
     await navigator.clipboard.writeText(text);
-    showToast('질문이 복사되었습니다');
     triggerCharacterHappy();
     return true;
   } catch (error) {
@@ -188,7 +188,6 @@ async function copyToClipboard(text) {
     textArea.select();
     try {
       document.execCommand('copy');
-      showToast('질문이 복사되었습니다');
       triggerCharacterHappy();
       document.body.removeChild(textArea);
       return true;
@@ -288,18 +287,27 @@ function setupEventListeners() {
     }
   });
 
-  // Kakao buttons
-  $('#kakaoDailyBtn').addEventListener('click', () => {
+  // Kakao buttons - copy then open app
+  $('#kakaoDailyBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
     if (daily) {
-      copyToClipboard(daily.text);
+      await copyToClipboard(daily.text);
       trackEvent('open_kakao', { question_type: 'daily' });
+      // Small delay to ensure copy completes before app switch
+      setTimeout(() => {
+        window.location.href = 'kakaotalk://';
+      }, 100);
     }
   });
 
-  $('#kakaoSpecialBtn').addEventListener('click', () => {
+  $('#kakaoSpecialBtn').addEventListener('click', async (e) => {
+    e.preventDefault();
     if (special) {
-      copyToClipboard(special.text);
+      await copyToClipboard(special.text);
       trackEvent('open_kakao', { question_type: 'special' });
+      setTimeout(() => {
+        window.location.href = 'kakaotalk://';
+      }, 100);
     }
   });
 
