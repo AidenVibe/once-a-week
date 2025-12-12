@@ -289,11 +289,11 @@ function openKakaoTalk() {
 }
 
 function hideKakaoOnDesktop() {
-  if (!detectMobile()) {
-    $$('.mobile-only').forEach(el => {
-      el.style.display = 'none';
-    });
-  }
+  // TODO: 카카오톡 딥링크 수정 후 복구
+  // 현재 모든 환경에서 카카오톡 버튼 숨김
+  $$('.mobile-only').forEach(el => {
+    el.style.display = 'none';
+  });
 }
 
 // ========================================
