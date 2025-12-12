@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주에한번은 - 부모님과의 대화를 더 깊게</title>
+  <meta name="description" content="매일 새로운 질문으로 부모님과 더 깊은 대화를 나눠보세요.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="주에한번은 - 오늘의 질문">
+  <meta property="og:description" content="부모님께 보내는 오늘의 질문을 받아보세요.">
+  <meta property="og:type" content="website">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Warm, inviting palette */
+      --bg-gradient-start: #fef9f3;
+      --bg-gradient-end: #fff5eb;
+      --bg-card: #ffffff;
+      --bg-card-hover: #fffcf9;
+
+      /* Text hierarchy */
+      --text-primary: #2a2520;
+      --text-secondary: #6b5d52;
+      --text-muted: #a39485;
+      --text-light: #c4b8ab;
+
+      /* Accent - warm orange with depth */
+      --accent: #e86f3a;
+      --accent-hover: #d45f2a;
+      --accent-light: #fff0e8;
+      --accent-glow: rgba(232, 111, 58, 0.15);
+
+      /* Secondary accent - soft coral */
+      --coral: #f4a583;
+      --coral-light: #fef0ea;
+
+      /* Success */
+      --success: #5a9a6e;
+      --success-light: #eef7f0;
+
+      /* Borders & shadows */
+      --border: #ede6df;
+      --border-light: #f5f0ea;
+      --shadow-soft: 0 4px 24px rgba(42, 37, 32, 0.06);
+      --shadow-medium: 0 8px 32px rgba(42, 37, 32, 0.08);
+      --shadow-strong: 0 12px 48px rgba(42, 37, 32, 0.12);
+
+      /* Spacing */
+      --space-xs: 4px;
+      --space-sm: 8px;
+      --space-md: 16px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+      background-attachment: fixed;
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Decorative background elements */
+    .bg-decoration {
+      position: fixed;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-circle-1 {
+      top: -120px;
+      right: -80px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .bg-circle-2 {
+      bottom: 10%;
+      left: -100px;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(244, 165, 131, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    /* Container */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 440px;
+      margin: 0 auto;
+      padding: var(--space-lg) var(--space-md);
+      min-height: 100vh;
+    }
+
+    /* Header with staggered animation */
+    .header {
+      text-align: center;
+      padding: var(--space-xl) 0 var(--space-2xl);
+      animation: fadeInDown 0.6s ease-out;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-family: 'Noto Serif KR', serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -1px;
+    }
+
+    .logo-icon {
+      font-size: 28px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .tagline {
+      margin-top: var(--space-sm);
+      font-size: 15px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    /* Date badge */
+    .date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: var(--space-md);
+      padding: 6px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .date-badge-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* Main question card */
+    .question-card {
+      position: relative;
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: var(--space-2xl) var(--space-lg);
+      margin-bottom: var(--space-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-medium);
+      animation: fadeInUp 0.6s ease-out 0.1s backwards;
+      overflow: hidden;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Card decorative corner */
+    .question-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, var(--accent-light) 0%, transparent 60%);
+      border-radius: 0 24px 0 0;
+    }
+
+    .card-label {
+      position: relative;
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: var(--space-lg);
+    }
+
+    .question-area {
+      position: relative;
+      text-align: center;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .question-text {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.65;
+      color: var(--text-primary);
+      word-break: keep-all;
+      transition: opacity 0.3s ease;
+    }
+
+    .question-meta {
+      margin-top: var(--space-lg);
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .question-tag {
+      font-size: 12px;
+      padding: 5px 12px;
+      background: var(--bg-gradient-start);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Action buttons */
+    .action-buttons {
+      display: flex;
+      gap: var(--space-sm);
+      margin-top: var(--space-xl);
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+      color: white;
+      box-shadow: 0 4px 16px rgba(232, 111, 58, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(232, 111, 58, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--bg-gradient-start);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-card);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-icon {
+      font-size: 16px;
+    }
+
+    /* Week questions card */
+    .week-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      animation: fadeInUp 0.6s ease-out 0.2s backwards;
+    }
+
+    .week-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+
+    .week-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .week-card-count {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .week-list {
+      list-style: none;
+    }
+
+    .week-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .week-item:last-child {
+      border-bottom: none;
+    }
+
+    .week-item:hover {
+      padding-left: var(--space-sm);
+    }
+
+    .week-item-dot {
+      width: 8px;
+      height: 8px;
+      margin-top: 7px;
+      border-radius: 50%;
+      background: var(--border);
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .week-item.today .week-item-dot {
+      background: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .week-item.past .week-item-dot {
+      background: var(--success);
+    }
+
+    .week-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .week-item-day {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .week-item.today .week-item-day {
+      color: var(--accent);
+    }
+
+    .week-item-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .week-item.future .week-item-text {
+      color: var(--text-light);
+      font-style: italic;
+    }
+
+    /* CTA card */
+    .cta-card {
+      background: linear-gradient(135deg, var(--accent-light) 0%, var(--coral-light) 100%);
+      border-radius: 20px;
+      padding: var(--space-xl) var(--space-lg);
+      text-align: center;
+      border: 1px solid rgba(232, 111, 58, 0.15);
+      animation: fadeInUp 0.6s ease-out 0.3s backwards;
+    }
+
+    .cta-icon {
+      font-size: 32px;
+      margin-bottom: var(--space-sm);
+    }
+
+    .cta-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .cta-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-md);
+    }
+
+    .btn-telegram {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: #0088cc;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-telegram:hover {
+      background: #0077b5;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0, 136, 204, 0.3);
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: var(--shadow-strong);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: var(--space-xl) 0;
+      color: var(--text-light);
+      font-size: 13px;
+    }
+
+    .footer a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      color: var(--accent);
+    }
+
+    /* Responsive */
+    @media (max-width: 380px) {
+      .question-text {
+        font-size: 20px;
+      }
+
+      .container {
+        padding: var(--space-md) var(--space-sm);
+      }
+    }
+
+    /* Loading state */
+    .loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    /* Copy animation */
+    @keyframes copyPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .btn-copied {
+      animation: copyPulse 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background decorations -->
+  <div class="bg-decoration bg-circle-1"></div>
+  <div class="bg-decoration bg-circle-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="logo">
+        <span class="logo-icon">&#x1F426;</span>
+        <span>주에한번은</span>
+      </h1>
+      <p class="tagline">부모님과의 대화를 더 깊게</p>
+      <div class="date-badge">
+        <span class="date-badge-dot"></span>
+        <span id="todayDate">12월 12일 목요일</span>
+      </div>
+    </header>
+
+    <!-- Today's Question -->
+    <main class="question-card">
+      <span class="card-label">오늘의 질문</span>
+      <div class="question-area" id="questionArea">
+        <p class="question-text" id="questionText">로딩 중...</p>
+        <div class="question-meta" id="questionMeta">
+          <span class="question-tag" id="categoryTag">-</span>
+          <span class="question-tag" id="difficultyTag">-</span>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button class="btn btn-secondary" id="refreshBtn">
+          <span class="btn-icon">&#x1F504;</span>
+          다른 질문
+        </button>
+        <button class="btn btn-primary" id="copyBtn">
+          <span class="btn-icon">&#x1F4CB;</span>
+          복사하기
+        </button>
+      </div>
+    </main>
+
+    <!-- This Week's Questions -->
+    <section class="week-card">
+      <div class="week-card-header">
+        <h2 class="week-card-title">이번 주 질문들</h2>
+        <span class="week-card-count" id="weekCount">0/7</span>
+      </div>
+      <ul class="week-list" id="weekList">
+        <!-- Populated by JS -->
+      </ul>
+    </section>
+
+    <!-- Telegram CTA -->
+    <section class="cta-card">
+      <div class="cta-icon">&#x1F48C;</div>
+      <h3 class="cta-title">매주 질문 받아보기</h3>
+      <p class="cta-desc">텔레그램으로 매주 월요일 질문을 보내드려요</p>
+      <a href="https://t.me/mwohae_bot" target="_blank" class="btn-telegram">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.692-1.653-1.123-2.678-1.799-1.185-.781-.417-1.21.258-1.911.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.442-.751-.244-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.121.1.154.234.17.332.015.098.034.322.019.496z"/>
+        </svg>
+        텔레그램 구독하기
+      </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>효도는 빈도입니다</p>
+    </footer>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // Constants
+    const DAYS_KO = ['일', '월', '화', '수', '목', '금', '토'];
+    const CATEGORY_LABELS = { past: '과거', present: '현재', future: '미래' };
+    const DIFFICULTY_LABELS = { 1: '가벼움', 2: '중간', 3: '깊음' };
+
+    // State
+    let questions = [];
+    let currentQuestion = null;
+    let weekQuestions = [];
+
+    // DOM Elements
+    const todayDateEl = document.getElementById('todayDate');
+    const questionTextEl = document.getElementById('questionText');
+    const questionMetaEl = document.getElementById('questionMeta');
+    const categoryTagEl = document.getElementById('categoryTag');
+    const difficultyTagEl = document.getElementById('difficultyTag');
+    const weekListEl = document.getElementById('weekList');
+    const weekCountEl = document.getElementById('weekCount');
+    const copyBtn = document.getElementById('copyBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const toast = document.getElementById('toast');
+
+    // Initialize
+    async function init() {
+      updateTodayDate();
+      await loadQuestions();
+      displayTodayQuestion();
+      displayWeekQuestions();
+      setupEventListeners();
+    }
+
+    // Load questions from JSON
+    async function loadQuestions() {
+      try {
+        const response = await fetch('./data/questions.json');
+        const data = await response.json();
+        questions = data.questions;
+      } catch (error) {
+        console.error('Failed to load questions:', error);
+        // Fallback: use embedded questions
+        questions = getEmbeddedQuestions();
+      }
+    }
+
+    // Fallback embedded questions
+    function getEmbeddedQuestions() {
+      return [
+        { id: 23, text: "요즘 가장 맛있게 먹은 음식은 뭐야?", category: "present", difficulty: 1 },
+        { id: 24, text: "요즘 하루 중 가장 좋은 시간은 언제야?", category: "present", difficulty: 1 },
+        { id: 1, text: "내가 어렸을 때 가장 웃겼던 순간은 뭐야?", category: "past", difficulty: 1 }
+      ];
+    }
+
+    // Update today's date display
+    function updateTodayDate() {
+      const today = new Date();
+      const month = today.getMonth() + 1;
+      const date = today.getDate();
+      const day = DAYS_KO[today.getDay()];
+      todayDateEl.textContent = `${month}월 ${date}일 ${day}요일`;
+    }
+
+    // Get question for a specific date (deterministic based on date)
+    function getQuestionForDate(date) {
+      const startDate = new Date('2024-12-12');
+      const diffDays = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+      const index = ((diffDays % questions.length) + questions.length) % questions.length;
+      return questions[index];
+    }
+
+    // Display today's question
+    function displayTodayQuestion() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      currentQuestion = getQuestionForDate(today);
+
+      if (currentQuestion) {
+        questionTextEl.textContent = `"${currentQuestion.text}"`;
+        categoryTagEl.textContent = CATEGORY_LABELS[currentQuestion.category];
+        difficultyTagEl.textContent = DIFFICULTY_LABELS[currentQuestion.difficulty];
+      }
+    }
+
+    // Display a random different question
+    function displayRandomQuestion() {
+      const filteredQuestions = questions.filter(q => q.id !== currentQuestion?.id);
+      const randomIndex = Math.floor(Math.random() * filteredQuestions.length);
+      currentQuestion = filteredQuestions[randomIndex];
+
+      questionTextEl.style.opacity = '0';
+      setTimeout(() => {
+        questionTextEl.textContent = `"${currentQuestion.text}"`;
+        categoryTagEl.textContent = CATEGORY_LABELS[currentQuestion.category];
+        difficultyTagEl.textContent = DIFFICULTY_LABELS[currentQuestion.difficulty];
+        questionTextEl.style.opacity = '1';
+      }, 150);
+    }
+
+    // Display this week's questions
+    function displayWeekQuestions() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Get Monday of current week
+      const monday = new Date(today);
+      const dayOfWeek = today.getDay();
+      const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      monday.setDate(today.getDate() + diff);
+
+      weekQuestions = [];
+      let html = '';
+      let passedCount = 0;
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+
+        const question = getQuestionForDate(date);
+        const isToday = date.getTime() === today.getTime();
+        const isPast = date < today;
+        const isFuture = date > today;
+
+        let statusClass = '';
+        if (isToday) statusClass = 'today';
+        else if (isPast) { statusClass = 'past'; passedCount++; }
+        else statusClass = 'future';
+
+        const dayName = DAYS_KO[date.getDay()];
+        const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+
+        weekQuestions.push({ date, question, isToday });
+
+        html += `
+          <li class="week-item ${statusClass}" data-index="${i}">
+            <span class="week-item-dot"></span>
+            <div class="week-item-content">
+              <span class="week-item-day">${dayName} ${dateStr}</span>
+              <p class="week-item-text">${isFuture ? '(예정)' : question.text}</p>
+            </div>
+          </li>
+        `;
+      }
+
+      weekListEl.innerHTML = html;
+      weekCountEl.textContent = `${passedCount + (today >= monday ? 1 : 0)}/7`;
+
+      // Add click handlers to week items
+      document.querySelectorAll('.week-item:not(.future)').forEach(item => {
+        item.addEventListener('click', () => {
+          const index = parseInt(item.dataset.index);
+          const { question } = weekQuestions[index];
+          currentQuestion = question;
+          questionTextEl.style.opacity = '0';
+          setTimeout(() => {
+            questionTextEl.textContent = `"${question.text}"`;
+            categoryTagEl.textContent = CATEGORY_LABELS[question.category];
+            difficultyTagEl.textContent = DIFFICULTY_LABELS[question.difficulty];
+            questionTextEl.style.opacity = '1';
+          }, 150);
+
+          // Scroll to question card
+          document.querySelector('.question-card').scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        });
+      });
+    }
+
+    // Copy question to clipboard
+    async function copyQuestion() {
+      if (!currentQuestion) return;
+
+      try {
+        await navigator.clipboard.writeText(currentQuestion.text);
+        copyBtn.classList.add('btn-copied');
+        showToast('질문이 복사되었어요!');
+        setTimeout(() => copyBtn.classList.remove('btn-copied'), 300);
+      } catch (error) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = currentQuestion.text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('질문이 복사되었어요!');
+      }
+    }
+
+    // Show toast notification
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      copyBtn.addEventListener('click', copyQuestion);
+      refreshBtn.addEventListener('click', displayRandomQuestion);
+    }
+
+    // Start
+    init();
+  </script>
+</body>
+</html>

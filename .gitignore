@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+
+# Bot data (contains subscriber info)
+bot/data/subscribers.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables (NEVER commit these!)
+.env
+.env.local
+bot/.env
+
+# Private planning & internal docs
+docs/
+archive/
+images/
+.claude/

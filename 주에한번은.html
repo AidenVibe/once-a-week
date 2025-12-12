@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주에한번은</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #faf9f7;
+      --bg-card: #ffffff;
+      --text-primary: #2d2a26;
+      --text-secondary: #6b6560;
+      --text-muted: #9a958f;
+      --accent: #e07b4c;
+      --accent-hover: #c96a3f;
+      --accent-light: #fef4f0;
+      --border: #e8e4df;
+      --shadow: rgba(45, 42, 38, 0.08);
+      --success: #5a9a6e;
+      --success-light: #f0f7f2;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-top: 20px;
+    }
+
+    .logo {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-icon {
+      display: inline-block;
+      margin-right: 8px;
+      font-size: 24px;
+    }
+
+    .tagline {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    /* Navigation */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--bg-card);
+      padding: 6px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .nav-tab:hover:not(.active) {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    /* Target Selection */
+    .target-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .target-btn {
+      flex: 1;
+      padding: 16px;
+      border: 2px solid var(--border);
+      background: var(--bg-card);
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .target-btn:hover {
+      border-color: var(--accent);
+      background: var(--accent-light);
+    }
+
+    .target-btn.active {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .target-btn-icon {
+      display: block;
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    /* Filters */
+    .filter-section {
+      margin-bottom: 16px;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      border-radius: 20px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-chip:hover {
+      border-color: var(--accent);
+    }
+
+    .filter-chip.active {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    /* Question Display */
+    .question-area {
+      text-align: center;
+      padding: 40px 20px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .question-text {
+      font-family: 'Noto Serif KR', serif;
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--text-primary);
+      word-break: keep-all;
+    }
+
+    .question-meta {
+      margin-top: 16px;
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .question-tag {
+      font-size: 11px;
+      padding: 4px 10px;
+      background: var(--bg-primary);
+      border-radius: 12px;
+      color: var(--text-muted);
+    }
+
+    .empty-state {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #4a8a5e;
+    }
+
+    .btn-sent {
+      background: var(--success-light);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    /* Question List (Management) */
+    .question-list {
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+
+    .question-item {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+
+    .question-item:last-child {
+      border-bottom: none;
+    }
+
+    .question-item:hover {
+      background: var(--bg-primary);
+    }
+
+    .question-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .question-item-tags {
+      display: flex;
+      gap: 6px;
+    }
+
+    .question-item-text {
+      font-size: 15px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+
+    .question-item-text.sent {
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+
+    .question-item-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 12px;
+      border-radius: 6px;
+    }
+
+    /* Edit Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 400px;
+      transform: translateY(20px);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.active .modal {
+      transform: translateY(0);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 15px;
+      resize: vertical;
+      min-height: 100px;
+      margin-bottom: 16px;
+    }
+
+    .modal-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 200;
+      transition: transform 0.3s;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Stats */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      padding: 16px;
+      background: var(--bg-primary);
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Page visibility */
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Responsive */
+    @media (max-width: 380px) {
+      .question-text {
+        font-size: 19px;
+      }
+
+      .target-btn-icon {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1 class="logo"><span class="logo-icon">🐦</span>주에한번은</h1>
+      <p class="tagline">부모님과의 대화를 더 깊게</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-page="main">질문 뽑기</button>
+      <button class="nav-tab" data-page="manage">질문 관리</button>
+    </nav>
+
+    <!-- Main Page -->
+    <div id="page-main" class="page active">
+      <!-- Target Selection -->
+      <div class="card">
+        <h2 class="card-title">누구에게 보낼까요?</h2>
+        <div class="target-buttons">
+          <button class="target-btn active" data-target="엄마">
+            <span class="target-btn-icon">👩</span>
+            엄마
+          </button>
+          <button class="target-btn" data-target="아빠">
+            <span class="target-btn-icon">👨</span>
+            아빠
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="card">
+        <div class="filter-section">
+          <label class="filter-label">카테고리</label>
+          <div class="filter-chips">
+            <button class="filter-chip active" data-category="all">전체</button>
+            <button class="filter-chip" data-category="past">과거</button>
+            <button class="filter-chip" data-category="present">현재</button>
+            <button class="filter-chip" data-category="future">미래</button>
+          </div>
+        </div>
+        <div class="filter-section">
+          <label class="filter-label">난이도</label>
+          <div class="filter-chips">
+            <button class="filter-chip active" data-difficulty="all">전체</button>
+            <button class="filter-chip" data-difficulty="1">가벼움</button>
+            <button class="filter-chip" data-difficulty="2">중간</button>
+            <button class="filter-chip" data-difficulty="3">깊음</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question Display -->
+      <div class="card">
+        <div class="question-area" id="questionArea">
+          <p class="empty-state">아래 버튼을 눌러<br>오늘의 질문을 뽑아보세요</p>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" id="drawBtn">
+            <span>✨</span> 질문 뽑기
+          </button>
+        </div>
+        <div class="action-buttons" id="questionActions" style="display: none;">
+          <button class="btn btn-secondary" id="redrawBtn">
+            <span>🔄</span> 다시 뽑기
+          </button>
+          <button class="btn btn-primary" id="copyBtn">
+            <span>📋</span> 복사
+          </button>
+        </div>
+        <div class="action-buttons" id="sentAction" style="display: none;">
+          <button class="btn btn-success" id="sentBtn">
+            <span>✓</span> 보냈어요
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manage Page -->
+    <div id="page-manage" class="page">
+      <div class="card">
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-value" id="totalCount">0</div>
+            <div class="stat-label">전체 질문</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="sentCount">0</div>
+            <div class="stat-label">보낸 질문</div>
+          </div>
+          <div class="stat">
+            <div class="stat-value" id="remainCount">0</div>
+            <div class="stat-label">남은 질문</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0;">
+        <div class="question-list" id="questionList">
+          <!-- Questions will be rendered here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <h3 class="modal-title">질문 수정</h3>
+      <textarea class="modal-input" id="editInput" placeholder="질문을 수정하세요..."></textarea>
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" id="cancelEdit">취소</button>
+        <button class="btn btn-primary" id="saveEdit">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // 질문 데이터베이스
+    const defaultQuestions = [
+      // 과거 - 가벼움
+      { id: 1, text: "내가 어렸을 때 가장 웃겼던 순간은 뭐야?", category: "past", difficulty: 1 },
+      { id: 2, text: "내가 어렸을 때 가장 좋아했던 음식은 뭐였어?", category: "past", difficulty: 1 },
+      { id: 3, text: "내가 어렸을 때 입버릇처럼 하던 말 있었어?", category: "past", difficulty: 1 },
+      { id: 4, text: "내가 어렸을 때 가장 좋아했던 장난감은 뭐였어?", category: "past", difficulty: 1 },
+      { id: 5, text: "내가 처음 걸었을 때 기억나?", category: "past", difficulty: 1 },
+      { id: 6, text: "내 이름 지을 때 다른 후보도 있었어?", category: "past", difficulty: 1 },
+      { id: 7, text: "내가 어렸을 때 제일 무서워했던 게 뭐야?", category: "past", difficulty: 1 },
+
+      // 과거 - 중간
+      { id: 8, text: "나한테 처음 자전거 가르쳐줬을 때 기억나?", category: "past", difficulty: 2 },
+      { id: 9, text: "내가 학교 다닐 때 가장 기억에 남는 에피소드는 뭐야?", category: "past", difficulty: 2 },
+      { id: 10, text: "나 키우면서 가장 뿌듯했던 순간은 언제야?", category: "past", difficulty: 2 },
+      { id: 11, text: "우리 가족 여행 중에 가장 기억에 남는 건 뭐야?", category: "past", difficulty: 2 },
+      { id: 12, text: "내가 어렸을 때 친구들이랑 어떻게 놀았어?", category: "past", difficulty: 2 },
+      { id: 13, text: "어렸을 때 내가 제일 사고 싶어했던 거 기억나?", category: "past", difficulty: 2 },
+      { id: 14, text: "나 키울 때 제일 신기했던 순간이 있었어?", category: "past", difficulty: 2 },
+      { id: 15, text: "내가 처음 '사랑해'라고 말했을 때 기억나?", category: "past", difficulty: 2 },
+
+      // 과거 - 깊음
+      { id: 16, text: "나 키우면서 가장 힘들었던 순간은 언제야?", category: "past", difficulty: 3 },
+      { id: 17, text: "젊었을 때 이루고 싶었던 꿈이 있었어?", category: "past", difficulty: 3 },
+      { id: 18, text: "나한테 물려주고 싶은 우리 집안의 가치관이 있어?", category: "past", difficulty: 3 },
+      { id: 19, text: "살면서 가장 후회되는 결정이 있어?", category: "past", difficulty: 3 },
+      { id: 20, text: "나 낳고 처음 안았을 때 무슨 생각 했어?", category: "past", difficulty: 3 },
+      { id: 21, text: "인생에서 가장 행복했던 시기는 언제야?", category: "past", difficulty: 3 },
+      { id: 22, text: "지금 다시 20대로 돌아간다면 뭘 하고 싶어?", category: "past", difficulty: 3 },
+
+      // 현재 - 가벼움
+      { id: 23, text: "요즘 가장 맛있게 먹은 음식은 뭐야?", category: "present", difficulty: 1 },
+      { id: 24, text: "요즘 하루 중 가장 좋은 시간은 언제야?", category: "present", difficulty: 1 },
+      { id: 25, text: "요즘 가장 재밌게 보는 TV 프로그램 뭐야?", category: "present", difficulty: 1 },
+      { id: 26, text: "요즘 건강은 어때? 불편한 데 없어?", category: "present", difficulty: 1 },
+      { id: 27, text: "요즘 날씨 어때? 춥지 않아?", category: "present", difficulty: 1 },
+      { id: 28, text: "요즘 뭐 하면서 시간 보내?", category: "present", difficulty: 1 },
+      { id: 29, text: "요즘 잠은 잘 자?", category: "present", difficulty: 1 },
+      { id: 30, text: "요즘 제일 자주 먹는 음식은 뭐야?", category: "present", difficulty: 1 },
+
+      // 현재 - 중간
+      { id: 31, text: "요즘 자주 생각나는 사람 있어?", category: "present", difficulty: 2 },
+      { id: 32, text: "요즘 새로 시작한 취미나 관심사 있어?", category: "present", difficulty: 2 },
+      { id: 33, text: "요즘 나한테 하고 싶은 말 있어?", category: "present", difficulty: 2 },
+      { id: 34, text: "요즘 고민 있으면 말해줘, 내가 도와줄게", category: "present", difficulty: 2 },
+      { id: 35, text: "요즘 제일 즐거울 때가 언제야?", category: "present", difficulty: 2 },
+      { id: 36, text: "요즘 가장 보고 싶은 사람이 누구야?", category: "present", difficulty: 2 },
+      { id: 37, text: "요즘 읽고 있는 책이나 기사 있어?", category: "present", difficulty: 2 },
+
+      // 현재 - 깊음
+      { id: 38, text: "요즘 삶에서 가장 감사한 건 뭐야?", category: "present", difficulty: 3 },
+      { id: 39, text: "요즘 나에 대해 걱정되는 거 있어?", category: "present", difficulty: 3 },
+      { id: 40, text: "요즘 가장 마음이 편안할 때는 언제야?", category: "present", difficulty: 3 },
+      { id: 41, text: "요즘 나한테 서운한 거 있으면 말해줘", category: "present", difficulty: 3 },
+
+      // 미래 - 가벼움
+      { id: 42, text: "같이 가보고 싶은 곳 있어?", category: "future", difficulty: 1 },
+      { id: 43, text: "내가 해드리면 좋겠는 거 있어?", category: "future", difficulty: 1 },
+      { id: 44, text: "먹어보고 싶은 음식 있어? 내가 사드릴게", category: "future", difficulty: 1 },
+
+      // 미래 - 중간
+      { id: 45, text: "앞으로 꼭 해보고 싶은 거 있어?", category: "future", difficulty: 2 },
+      { id: 46, text: "같이 해보고 싶은 활동이 있어?", category: "future", difficulty: 2 },
+      { id: 47, text: "배워보고 싶었던 게 있어?", category: "future", difficulty: 2 },
+      { id: 48, text: "언젠가 꼭 가보고 싶은 나라가 있어?", category: "future", difficulty: 2 },
+      { id: 49, text: "올해 안에 꼭 하고 싶은 거 있어?", category: "future", difficulty: 2 },
+
+      // 미래 - 깊음
+      { id: 50, text: "나한테 꼭 해주고 싶은 말이 있어?", category: "future", difficulty: 3 },
+      { id: 51, text: "내가 어떤 사람이 됐으면 좋겠어?", category: "future", difficulty: 3 },
+      { id: 52, text: "나중에 손주가 생기면 어떤 할머니/할아버지가 되고 싶어?", category: "future", difficulty: 3 },
+      { id: 53, text: "나한테 꼭 전해주고 싶은 인생 교훈이 있어?", category: "future", difficulty: 3 },
+      { id: 54, text: "우리 가족이 앞으로 어떻게 됐으면 좋겠어?", category: "future", difficulty: 3 },
+      { id: 55, text: "내가 나중에 부모가 되면 어떤 조언을 해주고 싶어?", category: "future", difficulty: 3 },
+    ];
+
+    // State
+    let state = {
+      target: '엄마',
+      category: 'all',
+      difficulty: 'all',
+      currentQuestion: null,
+      questions: [],
+      sentQuestions: []
+    };
+
+    // DOM Elements
+    const questionArea = document.getElementById('questionArea');
+    const drawBtn = document.getElementById('drawBtn');
+    const questionActions = document.getElementById('questionActions');
+    const sentAction = document.getElementById('sentAction');
+    const redrawBtn = document.getElementById('redrawBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const sentBtn = document.getElementById('sentBtn');
+    const questionList = document.getElementById('questionList');
+    const editModal = document.getElementById('editModal');
+    const editInput = document.getElementById('editInput');
+    const toast = document.getElementById('toast');
+
+    // Initialize
+    function init() {
+      loadData();
+      setupEventListeners();
+      updateStats();
+    }
+
+    // Load data from localStorage
+    function loadData() {
+      const savedQuestions = localStorage.getItem('questions');
+      const savedSent = localStorage.getItem('sentQuestions');
+
+      if (savedQuestions) {
+        state.questions = JSON.parse(savedQuestions);
+      } else {
+        state.questions = JSON.parse(JSON.stringify(defaultQuestions));
+        saveData();
+      }
+
+      if (savedSent) {
+        state.sentQuestions = JSON.parse(savedSent);
+      }
+    }
+
+    // Save data to localStorage
+    function saveData() {
+      localStorage.setItem('questions', JSON.stringify(state.questions));
+      localStorage.setItem('sentQuestions', JSON.stringify(state.sentQuestions));
+    }
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Navigation
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+
+          document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+          document.getElementById(`page-${tab.dataset.page}`).classList.add('active');
+
+          if (tab.dataset.page === 'manage') {
+            renderQuestionList();
+          }
+        });
+      });
+
+      // Target selection
+      document.querySelectorAll('.target-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          state.target = btn.dataset.target;
+        });
+      });
+
+      // Category filter
+      document.querySelectorAll('[data-category]').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('[data-category]').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.category = chip.dataset.category;
+        });
+      });
+
+      // Difficulty filter
+      document.querySelectorAll('[data-difficulty]').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('[data-difficulty]').forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+          state.difficulty = chip.dataset.difficulty;
+        });
+      });
+
+      // Draw button
+      drawBtn.addEventListener('click', drawQuestion);
+      redrawBtn.addEventListener('click', drawQuestion);
+
+      // Copy button
+      copyBtn.addEventListener('click', copyQuestion);
+
+      // Sent button
+      sentBtn.addEventListener('click', markAsSent);
+
+      // Modal
+      document.getElementById('cancelEdit').addEventListener('click', closeModal);
+      document.getElementById('saveEdit').addEventListener('click', saveEdit);
+      editModal.addEventListener('click', (e) => {
+        if (e.target === editModal) closeModal();
+      });
+    }
+
+    // Draw a random question
+    function drawQuestion() {
+      let filtered = state.questions.filter(q => !state.sentQuestions.includes(q.id));
+
+      if (state.category !== 'all') {
+        filtered = filtered.filter(q => q.category === state.category);
+      }
+
+      if (state.difficulty !== 'all') {
+        filtered = filtered.filter(q => q.difficulty === parseInt(state.difficulty));
+      }
+
+      if (filtered.length === 0) {
+        questionArea.innerHTML = `<p class="empty-state">조건에 맞는 질문이 없어요.<br>필터를 변경하거나 보낸 질문을 초기화해보세요.</p>`;
+        drawBtn.style.display = 'flex';
+        questionActions.style.display = 'none';
+        sentAction.style.display = 'none';
+        return;
+      }
+
+      const randomIndex = Math.floor(Math.random() * filtered.length);
+      state.currentQuestion = filtered[randomIndex];
+
+      const categoryLabels = { past: '과거', present: '현재', future: '미래' };
+      const difficultyLabels = { 1: '가벼움', 2: '중간', 3: '깊음' };
+
+      questionArea.innerHTML = `
+        <p class="question-text">"${state.currentQuestion.text.replace('엄마', state.target).replace('아빠', state.target)}"</p>
+        <div class="question-meta">
+          <span class="question-tag">${categoryLabels[state.currentQuestion.category]}</span>
+          <span class="question-tag">${difficultyLabels[state.currentQuestion.difficulty]}</span>
+        </div>
+      `;
+
+      drawBtn.style.display = 'none';
+      questionActions.style.display = 'flex';
+      sentAction.style.display = 'flex';
+    }
+
+    // Copy question to clipboard
+    function copyQuestion() {
+      if (!state.currentQuestion) return;
+
+      const text = state.currentQuestion.text.replace('엄마', state.target).replace('아빠', state.target);
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('질문이 복사되었어요!');
+      });
+    }
+
+    // Mark question as sent
+    function markAsSent() {
+      if (!state.currentQuestion) return;
+
+      if (!state.sentQuestions.includes(state.currentQuestion.id)) {
+        state.sentQuestions.push(state.currentQuestion.id);
+        saveData();
+        updateStats();
+      }
+
+      sentBtn.innerHTML = '<span>✓</span> 보냈어요!';
+      sentBtn.classList.remove('btn-success');
+      sentBtn.classList.add('btn-sent');
+      sentBtn.disabled = true;
+
+      showToast(`${state.target}에게 질문을 보냈어요! 💕`);
+    }
+
+    // Render question list for management
+    function renderQuestionList() {
+      const categoryLabels = { past: '과거', present: '현재', future: '미래' };
+      const difficultyLabels = { 1: '가벼움', 2: '중간', 3: '깊음' };
+
+      questionList.innerHTML = state.questions.map(q => `
+        <div class="question-item">
+          <div class="question-item-header">
+            <div class="question-item-tags">
+              <span class="question-tag">${categoryLabels[q.category]}</span>
+              <span class="question-tag">${difficultyLabels[q.difficulty]}</span>
+            </div>
+          </div>
+          <p class="question-item-text ${state.sentQuestions.includes(q.id) ? 'sent' : ''}">${q.text}</p>
+          <div class="question-item-actions">
+            <button class="btn btn-secondary btn-small" onclick="openEditModal(${q.id})">수정</button>
+            ${state.sentQuestions.includes(q.id)
+              ? `<button class="btn btn-secondary btn-small" onclick="unmarkSent(${q.id})">다시 사용</button>`
+              : ''}
+          </div>
+        </div>
+      `).join('');
+
+      updateStats();
+    }
+
+    // Update statistics
+    function updateStats() {
+      document.getElementById('totalCount').textContent = state.questions.length;
+      document.getElementById('sentCount').textContent = state.sentQuestions.length;
+      document.getElementById('remainCount').textContent = state.questions.length - state.sentQuestions.length;
+    }
+
+    // Open edit modal
+    let editingId = null;
+    window.openEditModal = function(id) {
+      editingId = id;
+      const question = state.questions.find(q => q.id === id);
+      editInput.value = question.text;
+      editModal.classList.add('active');
+    }
+
+    // Close modal
+    function closeModal() {
+      editModal.classList.remove('active');
+      editingId = null;
+    }
+
+    // Save edit
+    function saveEdit() {
+      if (editingId === null) return;
+
+      const question = state.questions.find(q => q.id === editingId);
+      question.text = editInput.value;
+      saveData();
+      renderQuestionList();
+      closeModal();
+      showToast('질문이 수정되었어요!');
+    }
+
+    // Unmark as sent
+    window.unmarkSent = function(id) {
+      state.sentQuestions = state.sentQuestions.filter(qId => qId !== id);
+      saveData();
+      renderQuestionList();
+      showToast('질문을 다시 사용할 수 있어요!');
+    }
+
+    // Show toast
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Reset sent button state when drawing new question
+    function resetSentButton() {
+      sentBtn.innerHTML = '<span>✓</span> 보냈어요';
+      sentBtn.classList.add('btn-success');
+      sentBtn.classList.remove('btn-sent');
+      sentBtn.disabled = false;
+    }
+
+    // Override drawQuestion to reset sent button
+    const originalDrawQuestion = drawQuestion;
+    drawQuestion = function() {
+      resetSentButton();
+      originalDrawQuestion();
+    }
+
+    // Start
+    init();
+  </script>
+</body>
+</html>
