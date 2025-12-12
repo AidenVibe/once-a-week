@@ -1,0 +1,19 @@
+# Fly.io configuration for 주에한번은 Telegram Bot
+
+app = "jueehanbeoneun-bot"
+primary_region = "nrt"  # Tokyo (closest to Korea)
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  # Non-sensitive environment variables
+  TZ = "Asia/Seoul"
+
+# No HTTP service needed - this is a background worker bot
+# The bot connects outbound to Telegram API
+
+[vm]
+  memory = "256mb"
+  cpu_kind = "shared"
+  cpus = 1
