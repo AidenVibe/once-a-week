@@ -31,7 +31,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Constants
-THEME_LABELS = {"past": "과거", "future": "미래"}
+THEME_LABELS = {"past": "과거", "future": "미래", "holiday": "기념일"}
 START_DATE = datetime(2024, 12, 12)
 
 # Data storage paths
@@ -46,20 +46,21 @@ def ensure_data_dir():
 
 
 def load_questions() -> dict:
-    """Load questions from JSON file (new schema with daily/special)."""
+    """Load questions from JSON file (new schema with daily/special/holidays)."""
     try:
         with open(QUESTIONS_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
             return {
                 "daily": data.get("questions", {}).get("daily", []),
-                "special": data.get("questions", {}).get("special", [])
+                "special": data.get("questions", {}).get("special", []),
+                "holidays": data.get("holidays", [])
             }
     except FileNotFoundError:
         logger.error(f"Questions file not found: {QUESTIONS_PATH}")
-        return {"daily": [], "special": []}
+        return {"daily": [], "special": [], "holidays": []}
     except json.JSONDecodeError:
         logger.error(f"Invalid JSON in questions file: {QUESTIONS_PATH}")
-        return {"daily": [], "special": []}
+        return {"daily": [], "special": [], "holidays": []}
 
 
 def load_subscribers() -> dict:
@@ -135,7 +136,19 @@ def get_daily_question(questions: dict, date: datetime) -> dict:
 
 
 def get_special_question(questions: dict, date: datetime) -> dict:
-    """Get special question for a specific date."""
+    """Get special question for a specific date (holiday takes priority)."""
+    # 1. Holiday check
+    mmdd = date.strftime("%m-%d")
+    holidays = questions.get("holidays", [])
+    for holiday in holidays:
+        if holiday.get("date") == mmdd:
+            return {
+                "text": holiday.get("question", ""),
+                "theme": "holiday",
+                "name": holiday.get("name", "")
+            }
+
+    # 2. Regular special question
     special_list = questions.get("special", [])
     if not special_list:
         return None

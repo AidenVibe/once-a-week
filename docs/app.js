@@ -1,5 +1,5 @@
 /**
- * 주에한번은 - App v3.0 (AI Studio Inspired)
+ * 주에한번은 - App v3.0
  */
 
 // ========================================
@@ -9,16 +9,18 @@ const START_DATE = new Date('2024-12-12');
 START_DATE.setHours(0, 0, 0, 0);
 
 const DAYS_KO = ['일', '월', '화', '수', '목', '금', '토'];
-const THEME_LABELS = { past: '과거', future: '미래' };
+const THEME_LABELS = { past: '과거', future: '미래', holiday: '기념일' };
 
 const CHARACTER_MESSAGES = [
-  '전화 한 통 어때요?',
+  '전화 한 통 어떨까요?',
   '오늘도 화이팅!',
-  '부모님이 기다리셔요',
-  '따뜻한 말 한마디',
+  '부모님이 기다리신대요',
+  '행복은 강도가 아닌 빈도!',
+  '따뜻한 말 한마디 건네볼까요?',
   '지금이 바로 타이밍!',
-  '어떤 질문을 보내보지?',
-  '목소리를 들려드려요'
+  '효도는 강도가 아닌 빈도!',
+  '오늘, 목소리 들려드려볼까요?',
+  '생각보다 재미있을 거예요'
 ];
 
 // ========================================
@@ -26,6 +28,7 @@ const CHARACTER_MESSAGES = [
 // ========================================
 let dailyQuestions = [];
 let specialQuestions = [];
+let holidays = [];
 
 // ========================================
 // DOM Elements
@@ -59,6 +62,12 @@ function formatShortDate(date) {
 // ========================================
 // Question Selection
 // ========================================
+function formatMMDD(date) {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${month}-${day}`;
+}
+
 function getDailyQuestion(date) {
   if (dailyQuestions.length === 0) return null;
   const days = getDaysSinceStart(date);
@@ -67,6 +76,14 @@ function getDailyQuestion(date) {
 }
 
 function getSpecialQuestion(date) {
+  // 1. Holiday check
+  const mmdd = formatMMDD(date);
+  const holiday = holidays.find(h => h.date === mmdd);
+  if (holiday) {
+    return { text: holiday.question, theme: 'holiday', name: holiday.name };
+  }
+
+  // 2. Regular special question
   if (specialQuestions.length === 0) return null;
   const days = getDaysSinceStart(date);
   const index = ((days % specialQuestions.length) + specialQuestions.length) % specialQuestions.length;
@@ -82,6 +99,7 @@ async function loadQuestions() {
     const data = await response.json();
     dailyQuestions = data.questions.daily || [];
     specialQuestions = data.questions.special || [];
+    holidays = data.holidays || [];
     return true;
   } catch (error) {
     console.error('Failed to load questions:', error);
